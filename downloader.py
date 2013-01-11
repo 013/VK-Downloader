@@ -27,21 +27,23 @@ class MyForm(QMainWindow):
             self.ui.songList.clear()
             query = self.ui.lineEdit.text()         #Get search query
             search = self.vk.search(unicode(query)) #Perform search
-            parse = self.vk.parsesearch(search)     #Parse search result
 
             #Add search result to the QListWidget
-            for idx, x in enumerate(parse):
-                s = " - "
-                listString = unicode(idx+1) + s + x['artist'] + s + x['title'] + s + x['duration']
-                dataString = x['artist'] + s + x['title'] + ".mp3"
-                item = QListWidgetItem(listString);
-                
-                #Add download data to the list
-                data = [x['url'], dataString]
-                item.setData(Qt.UserRole, data)
+            if search:
+                for idx, x in enumerate(search):
+                    s = " - "
+                    listString = unicode(idx+1) + s + x['artist'] + s + x['title'] + s + x['duration']
+                    dataString = x['artist'] + s + x['title'] + ".mp3"
+                    item = QListWidgetItem(listString);
+                    
+                    #Add download data to the list
+                    data = [x['url'], dataString]
+                    item.setData(Qt.UserRole, data)
 
-                #Add QWidgetListItems
-                self.ui.songList.addItem(item)
+                    #Add QWidgetListItems
+                    self.ui.songList.addItem(item)
+            else:
+                pass
 
     def loginWindow(self):
         #Spawn the login modal.

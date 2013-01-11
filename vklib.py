@@ -54,7 +54,7 @@ class vKontakte():
             print 'Unknown exception'
             return False
         else:
-            return request
+            return self.parsesearch(request)
 
     def parsesearch(self, sobject):
         #Parse the search result
