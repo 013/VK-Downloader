@@ -2,6 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import os
+import sanitize
 
 class vKontakte():
     """VK.com music Library"""
@@ -81,9 +82,11 @@ class vKontakte():
     def download(self, url, name):
         #Download mp3
 
+        filename = sanitize.sanitize(name)
+
         request = self.client.get(url)
         
-        f = open(os.curdir + "/downloads/" + name, "wb")
+        f = open(os.curdir + "/downloads/" + filename, "wb")
 
         with f as code:
             code.write(request.content)
