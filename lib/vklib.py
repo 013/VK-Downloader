@@ -92,3 +92,13 @@ class vKontakte():
                     break
 
                 code.write(chunk)
+
+    def getSize(self, url):
+        #Get size of mp3
+        try:
+            request = self.client.head(url)
+            mbDiv = 1024.0 * 1024.0
+            size = float(request.headers['content-length']) / div
+            return size
+        except:
+            return False
