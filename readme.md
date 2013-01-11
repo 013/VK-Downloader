@@ -2,9 +2,9 @@
 A cross-platform vk.com mp3 downloader written in Python/pyqt.
 
 ## Getting Started
-Install the dependancies and launch vkdownloader.py
+Install the dependencies and launch vkdownloader.py
 
-## Dependancies
+## Dependencies
 * BeautifulSoup4
 * Requests
 * PyQt4
