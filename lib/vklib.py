@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import os
-import lib.sanitize
+import sanitize
 
 class vKontakte():
     """VK.com music Library"""
@@ -84,11 +84,11 @@ class vKontakte():
 
         filename = sanitize.sanitize(name)
 
-        request = self.client.get(url)
+        request = self.client.get(url, prefetch=False)
         
-        f = open(os.curdir + "/downloads/" + filename, "wb")
+        with open(os.curdir + "/downloads/" + filename, "wb") as code:
+            for chunk in request.iter_content(1024):
+                if not chunk:
+                    break
 
-        with f as code:
-            code.write(request.content)
-        f.close()
-        print "done"
+                code.write(chunk)
