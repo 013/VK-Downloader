@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 import os
-import sanitize
+import lib.sanitize
 
 class vKontakte():
     """VK.com music Library"""
