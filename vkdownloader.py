@@ -1,71 +1,83 @@
-import sys, os
+import sys
+import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ui.gui import Ui_Form
 from ui.popup import Ui_Dialog
-from lib.vklib import vKontakte
+from lib.vklib import Vkontakte
+
 
 class MyForm(QMainWindow):
+    """Functions as a scope for the UI.
+    """
+
     def __init__(self, parent=None):
-        #initialization of the main window
+        """Initialization of the main window.
+        """
+
         QWidget.__init__(self, parent)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        #Setting signal connections
-        self.ui.loginBtn.clicked.connect(self.loginWindow)
+        # Setting signal connections
+        self.ui.loginBtn.clicked.connect(self.login_dialog)
         self.ui.searchBtn.clicked.connect(self.search)
         self.ui.lineEdit.returnPressed.connect(self.search)
-        self.ui.songList.itemActivated.connect(self.downloadItem)
-        
-        #Manage login status
+        self.ui.songList.itemActivated.connect(self.download_item)
+
+        # Manage login status
         self.ui.statusLbl.setText("Not logged in")
         self.loggedIn = False
 
     def search(self):
+        """Perform a search.
+        """
+
         if self.loggedIn:
             self.ui.songList.clear()
-            query = self.ui.lineEdit.text()         #Get search query
-            search = self.vk.search(unicode(query)) #Perform search
+            query = self.ui.lineEdit.text()             # Get search query
+            search = self.vk.search(unicode(query))     # Perform search
 
-            #Add search result to the QListWidget
+            # Add search result to the QListWidget
             if search:
                 for idx, x in enumerate(search):
                     s = " - "
                     listString = unicode(idx+1) + s + x['artist'] + s + x['title'] + s + x['duration']
                     dataString = x['artist'] + s + x['title'] + ".mp3"
-                    item = QListWidgetItem(listString);
-                    
-                    #Add download data to the list
+                    item = QListWidgetItem(listString)
+
+                    # Add download data to the list
                     data = [x['url'], dataString]
                     item.setData(Qt.UserRole, data)
 
-                    #Add QWidgetListItems
+                    # Add QWidgetListItems
                     self.ui.songList.addItem(item)
             else:
                 pass
 
-    def loginWindow(self):
-        #Spawn the login modal.
+    def login_dialog(self):
+        """Spawn the login modal.
+        """
+
         self.dialog = QDialog()
         self.dialog.ui = Ui_Dialog()
         self.dialog.ui.setupUi(self.dialog)
         self.dialog.setAttribute(Qt.WA_DeleteOnClose)
-        self.dialog.ui.login.clicked.connect(self.takeLogin)
+        self.dialog.ui.login.clicked.connect(self.take_login)
         self.dialog.ui.password.setEchoMode(QLineEdit.Password)
         self.dialog.exec_()
 
+    def take_login(self):
+        """Performs a login on VK.com.
+        """
 
-    def takeLogin(self):
-        #Login to vk.com
-        
         username = self.dialog.ui.username.text()
         password = self.dialog.ui.password.text()
 
-        self.dialog.accept() #Accept the form
+        self.dialog.accept()    # Accept the form
 
-        #Call the login function
-        self.vk = vKontakte(unicode(username), unicode(password))
+        # Call the login function
+        self.vk = Vkontakte(unicode(username), unicode(password))
         login = self.vk.login()
 
         if login:
@@ -74,23 +86,27 @@ class MyForm(QMainWindow):
         else:
             self.ui.statusLbl.setText("Wrong user/password")
 
-    def downloadItem(self, item):
-        #Download an mp3 from the list
+    def download_item(self, item):
+        """Download an mp3 from the list
+        """
 
         url = item.data(Qt.UserRole).toPyObject()[0]
         name = item.data(Qt.UserRole).toPyObject()[1]
 
-        #Initialize background download thread.
+        # Initialize background download thread.
         self.workThread = WorkThread(url, name)
-        self.connect(self.workThread, SIGNAL("downloadStatus(QString)"), self.downloadStatus)
+        self.connect(self.workThread, SIGNAL("download_status(QString)"), self.download_status)
         self.workThread.start()
 
-    def downloadStatus(self, status):
-        #Update download status
+    def download_status(self, status):
+        """Handles signals from the download threads, and update the status.
+        """
         self.ui.currentLbl.setText(status)
 
+
 class WorkThread(QThread):
-    #Downloader thread
+    """Downloader thread
+    """
 
     def __init__(self, url, name):
         QThread.__init__(self)
@@ -98,21 +114,19 @@ class WorkThread(QThread):
         self.name = name
 
     def run(self):
-        self.emit(SIGNAL('downloadStatus(QString)'), "Download Started...")
+        self.emit(SIGNAL('download_status(QString)'), "Download Started...")
 
         myapp.vk.download(unicode(self.url), unicode(self.name))
-        
-        self.emit(SIGNAL('downloadStatus(QString)'), "Download Finished")
+
+        self.emit(SIGNAL('download_status(QString)'), "Download Finished")
         return
 
 if __name__ == "__main__":
-    #Initialize the app.
-
-    directory = "downloads" #Folder where the downloads will be stored
+    directory = "downloads"        # Folder where the downloads will be stored
     if not os.path.exists(directory):
         os.makedirs(directory)
 
     app = QApplication(sys.argv)
-    myapp = MyForm()    
+    myapp = MyForm()
     myapp.show()
     sys.exit(app.exec_())
