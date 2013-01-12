@@ -3,7 +3,7 @@ import os
 import platform
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from ui.gui import Ui_Form
+from ui.gui import Ui_MainWindow
 from ui.popup import Ui_Dialog
 from lib.vklib import Vkontakte
 
@@ -17,18 +17,19 @@ class MyForm(QMainWindow):
         """
 
         QWidget.__init__(self, parent)
-        self.ui = Ui_Form()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         # Setting signal connections
-        self.ui.loginBtn.clicked.connect(self.login_dialog)
         self.ui.searchBtn.clicked.connect(self.search)
-        self.ui.lineEdit.returnPressed.connect(self.search)
+        self.ui.searchBar.returnPressed.connect(self.search)
         self.ui.songList.itemActivated.connect(self.download_item)
 
         # Manage login status
         self.ui.statusLbl.setText("Not logged in")
         self.loggedIn = False
+
+        self.login_dialog()
 
     def search(self):
         """Perform a search.
@@ -36,7 +37,7 @@ class MyForm(QMainWindow):
 
         if self.loggedIn:
             self.ui.songList.clear()
-            query = self.ui.lineEdit.text()             # Get search query
+            query = self.ui.searchBar.text()             # Get search query
             search = self.vk.search(unicode(query))     # Perform search
 
             # Add search result to the QListWidget
@@ -86,6 +87,7 @@ class MyForm(QMainWindow):
             self.loggedIn = True
         else:
             self.ui.statusLbl.setText("Wrong user/password")
+            self.login_dialog()
 
     def download_item(self, item):
         """Download an mp3 from the list
@@ -102,7 +104,8 @@ class MyForm(QMainWindow):
     def download_status(self, status):
         """Handles signals from the download threads, and update the status.
         """
-        self.ui.currentLbl.setText(status)
+        self.ui.downloadList.addItem(status)
+        self.ui.downloadList.scrollToBottom()
 
 
 class WorkThread(QThread):
@@ -115,11 +118,11 @@ class WorkThread(QThread):
         self.name = name
 
     def run(self):
-        self.emit(SIGNAL('download_status(QString)'), "Download Started...")
+        self.emit(SIGNAL('download_status(QString)'), "Started downloading: " + unicode(self.name))
 
         myapp.vk.download(unicode(self.url), unicode(self.name))
 
-        self.emit(SIGNAL('download_status(QString)'), "Download Finished")
+        self.emit(SIGNAL('download_status(QString)'), "Finished downloading: " + unicode(self.name))
         return
 
 if __name__ == "__main__":
