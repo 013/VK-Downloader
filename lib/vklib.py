@@ -1,10 +1,10 @@
 import os
 import platform
-import requests
 import json
-from bs4 import BeautifulSoup
+import re
+import requests
 import sanitize
-
+from bs4 import BeautifulSoup
 
 class Vkontakte():
     """VK.com music Library
@@ -79,9 +79,11 @@ class Vkontakte():
                 duration = x.find("div", "duration").text
                 download = x.find("input").attrs['value'][:-4]
 
-                info = x.find_all("span")
-                artist = info[0].text
-                title = info[1].text
+                for node in x.findAll("a", attrs={"href": re.compile('/search*')}):
+                    artist = ''.join(node.findAll(text=True))
+
+                for node in x.findAll("span", "title"):
+                    title = ''.join(node.findAll(text=True))
 
                 info = {'duration': duration, 'url': download,
                         'artist': artist, 'title': title}
