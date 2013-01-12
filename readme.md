@@ -6,9 +6,8 @@ Install the dependencies and launch vkdownloader.py
 
 ## Dependencies
 * BeautifulSoup4
-* Requests
+* Requests 1.0.0+
 * PyQt4
 
 ## Screenshots
 ![Main window](http://i.imgur.com/Nhxf4.png)
-

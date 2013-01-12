@@ -19,7 +19,9 @@ class Vkontakte():
         self.useragent = ("Mozilla/5.0 (Windows NT 6.2; WOW64) "
                           "AppleWebKit/537.15 (KHTML, like Gecko) "
                           "Chrome/24.0.1295.0 Safari/537.15")
-        self.client = requests.session(headers={'User-Agent': self.useragent})
+        self.client = requests.session()
+        self.client.headers.update({"User-Agent": self.useragent})
+
 
     def login(self):
         """Login to vk.com
@@ -98,7 +100,7 @@ class Vkontakte():
         """
 
         filename = sanitize.sanitize(name)
-        request = self.client.get(url, prefetch=False)
+        request = self.client.get(url, stream=True)
 
         if platform.system() == "Windows":
             filepath = os.curdir + "/downloads/" + filename

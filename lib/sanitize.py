@@ -24,7 +24,7 @@ def _partition_filename(filename):
     else:
         return (filename, None)
 
-def sanitize(filename, limit=260, whitespace=True, lower=True):
+def sanitize(filename, limit=100, whitespace=False, lower=False):
     # Clean up characters
     temp = unicode(filename.strip())
     temp = unicodedata.normalize('NFKD', temp).encode('ASCII', 'ignore')

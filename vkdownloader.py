@@ -1,5 +1,6 @@
 import sys
 import os
+import platform
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from ui.gui import Ui_Form
@@ -122,9 +123,11 @@ class WorkThread(QThread):
         return
 
 if __name__ == "__main__":
-    directory = "downloads"        # Folder where the downloads will be stored
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if platform.system() == "Windows":
+        directory = "downloads"        # Storing songs on windows
+        
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
     app = QApplication(sys.argv)
     myapp = MyForm()
