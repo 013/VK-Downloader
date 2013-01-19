@@ -10,4 +10,4 @@ Install the dependencies and launch vkdownloader.py
 * PyQt4
 
 ## Screenshots
-![Main window](http://i.imgur.com/Nhxf4.png)
+![Main window](http://i7.minus.com/jbs3E4it1EJaSf.PNG)
